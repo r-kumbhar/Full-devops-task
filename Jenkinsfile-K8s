@@ -1,0 +1,100 @@
+pipeline {
+
+    agent any
+
+    parameters {
+
+        choice(
+            name: 'ACTION',
+            choices: [
+                'Deploy_DB',
+                'Deploy_App',
+                'Remove_App',
+                'Remove_DB'
+            ],
+            description: 'Select Kubernetes Operation'
+        )
+    }
+
+    stages {
+
+        stage('Deploy Database') {
+
+            when {
+                expression { params.ACTION == 'Deploy_DB' }
+            }
+
+            steps {
+
+                sh 'kubectl apply -f k8s/namespace.yaml'
+
+                sh 'kubectl apply -f k8s/pvc.yaml'
+
+                sh 'kubectl apply -f k8s/mysql-service.yaml'
+
+                sh 'kubectl apply -f k8s/mysql-statefulset.yaml'
+            }
+        }
+
+        stage('Deploy Application') {
+
+            when {
+                expression { params.ACTION == 'Deploy_App' }
+            }
+
+            steps {
+
+                sh 'kubectl apply -f k8s/namespace.yaml'
+
+                sh 'kubectl apply -f k8s/deployment.yaml'
+
+                sh 'kubectl apply -f k8s/service.yaml'
+            }
+        }
+
+        stage('Remove Application') {
+
+            when {
+                expression { params.ACTION == 'Remove_App' }
+            }
+
+            steps {
+
+                sh 'kubectl delete -f k8s/service.yaml --ignore-not-found=true'
+
+                sh 'kubectl delete -f k8s/deployment.yaml --ignore-not-found=true'
+            }
+        }
+
+        stage('Remove Database') {
+
+            when {
+                expression { params.ACTION == 'Remove_DB' }
+            }
+
+            steps {
+
+                sh 'kubectl delete -f k8s/mysql-statefulset.yaml --ignore-not-found=true'
+
+                sh 'kubectl delete -f k8s/mysql-service.yaml --ignore-not-found=true'
+
+                sh 'kubectl delete -f k8s/pvc.yaml --ignore-not-found=true'
+            }
+        }
+    }
+
+    post {
+
+        success {
+
+            echo 'Kubernetes Operation Completed Successfully'
+
+        }
+
+        failure {
+
+            echo 'Pipeline Failed'
+
+        }
+    }
+}cl

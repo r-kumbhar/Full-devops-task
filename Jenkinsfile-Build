@@ -1,0 +1,88 @@
+pipeline {
+
+    agent any
+
+    tools {
+        maven 'maven'
+    }
+
+    environment {
+        IMAGE_NAME = "foodfiesta-springboot"
+        DOCKERHUB_REPO = "ro1hit/foodfiesta-springboot"
+    }
+
+    stages {
+
+        stage('Prepare') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build JAR') {
+            steps {
+                sh 'mvn clean package -DskipTests'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t ${IMAGE_NAME}:latest ."
+            }
+        }
+
+        stage('Docker Login') {
+            steps {
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-cred-id',
+                    usernameVariable: 'USER',
+                    passwordVariable: 'PASS'
+                )]) {
+
+                    sh '''
+                    echo "$PASS" | docker login -u "$USER" --password-stdin
+                    '''
+                }
+            }
+        }
+
+        stage('Tag Image') {
+            steps {
+                sh "docker tag ${IMAGE_NAME}:latest ${DOCKERHUB_REPO}:latest"
+            }
+        }
+
+        stage('Push Image') {
+            steps {
+                sh "docker push ${DOCKERHUB_REPO}:latest"
+            }
+        }
+
+        stage('Cleanup') {
+            steps {
+                sh 'docker system prune -af'
+            }
+        }
+    }
+
+    post {
+
+        always {
+            sh 'docker logout || true'
+        }
+
+        success {
+            echo 'Docker Image Successfully Built & Pushed'
+        }
+
+        failure {
+            echo 'Pipeline Failed'
+        }
+    }
+}
