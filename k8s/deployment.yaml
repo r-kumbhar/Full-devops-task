@@ -21,16 +21,17 @@ spec:
       containers:
       - name: foodfiesta
         image: ro1hit/foodfiesta-springboot:latest
+        imagePullPolicy: Always
 
         ports:
         - containerPort: 8080
 
         env:
         - name: SPRING_DATASOURCE_URL
-          value: jdbc:mysql://mysql-service:3306/myapplication?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+          value: "jdbc:mysql://mysql-service:3306/myapplication?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC"
 
         - name: SPRING_DATASOURCE_USERNAME
-          value: root
+          value: "root"
 
         - name: SPRING_DATASOURCE_PASSWORD
           value: "1234"
