@@ -1,16 +1,36 @@
-containers:
-- name: foodfiesta
-  image: ro1hit/foodfiesta-springboot:latest
+apiVersion: apps/v1
+kind: Deployment
 
-  ports:
-  - containerPort: 8080
+metadata:
+  name: foodfiesta
+  namespace: prod
 
-  env:
-  - name: SPRING_DATASOURCE_URL
-    value: jdbc:mysql://mysql-service:3306/myapplication?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+spec:
+  replicas: 2
 
-  - name: SPRING_DATASOURCE_USERNAME
-    value: root
+  selector:
+    matchLabels:
+      app: foodfiesta
 
-  - name: SPRING_DATASOURCE_PASSWORD
-    value: "1234"
+  template:
+    metadata:
+      labels:
+        app: foodfiesta
+
+    spec:
+      containers:
+      - name: foodfiesta
+        image: ro1hit/foodfiesta-springboot:latest
+
+        ports:
+        - containerPort: 8080
+
+        env:
+        - name: SPRING_DATASOURCE_URL
+          value: jdbc:mysql://mysql-service:3306/myapplication?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+
+        - name: SPRING_DATASOURCE_USERNAME
+          value: root
+
+        - name: SPRING_DATASOURCE_PASSWORD
+          value: "1234"
