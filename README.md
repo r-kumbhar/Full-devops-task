@@ -10,6 +10,7 @@ The project can also be configured to use PostgreSQL for deployment or productio
 
 ---
 
+[![architecture](https://github.com/r-kumbhar/Full-devops-task/blob/main/architecture.png)]
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.2-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://www.oracle.com/java/)
 [![H2](https://img.shields.io/badge/Database-H2-blue.svg)](https://www.h2database.com/)
