@@ -7,7 +7,7 @@ pipeline {
     }
 
     environment {
-        IMAGE_NAME = "foodfiesta-springboot"
+        IMAGE_NAME = "foodfiesta-springboot:latest"
         DOCKERHUB_REPO = "ro1hit/foodfiesta-springboot"
     }
 
